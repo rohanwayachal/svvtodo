@@ -1,0 +1,249 @@
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Jekyll v3.8.5">
+    <title>Home</title>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+
+    <script>
+    var app = angular.module("myApp", []);
+
+    app.controller("myCtrl",  function($scope,$http) {
+      $scope.todos=[{title:"one"},{title:"two"}]
+
+      let token=document.getElementById("token").innerHTML
+
+      $scope.title=""
+      $scope.desc=""
+
+
+      $scope.sendata=function()
+      {
+
+        if($scope.title=="")
+        {
+        document.getElementById("error").innerHTML="Title Cannot Be Blank"
+        return
+        }
+
+
+
+        $http({
+          headers:{
+              'auth-token':token},
+          method: 'POST',
+  url: 'addtodo',
+  data: JSON.stringify({'title':$scope.title, 'desc': $scope.desc})})
+  
+  .then((resp)=>{
+
+
+    $scope.title=""
+      $scope.desc=""
+
+
+        $scope.todos=resp.data.todos
+      })
+
+
+        }
+
+
+    $scope.deletetodo=function(id)
+    {
+      $scope.todos=$scope.todos.filter((todo)=>id!=todo._id)
+     
+      $http({
+          headers:{
+              'auth-token':token},
+          method: 'POST',
+  url: 'deletetodo',
+  data: JSON.stringify({id:id})
+          })
+
+    }
+
+      
+
+
+
+      //let resp= fetch("data" , {
+      $http.get("data",{
+		   headers: {
+        'auth-token':token,
+			'Accept': 'application/json',
+			'Content-Type': 'application/json'
+			},
+			//method: "GET",
+			}
+				
+		
+			).then((resp)=>{
+        
+        $scope.todos=resp.data.todos
+        console.log($scope.todos)
+
+        if($scope.todos.length==0)
+          document.getElementById("mylist").innerHTML="You no items in the list"
+      
+      })
+
+
+});
+
+    
+    </script>
+
+
+
+    
+
+   
+
+    <!-- Bootstrap core CSS -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+    </style>
+    <!-- Custom styles for this template -->
+  </head>
+  <body ng-app="myApp" ng-controller="myCtrl">
+
+
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+      <a class="navbar-brand" href="#">ToDo</a>
+      
+
+      <ul class="nav navbar-nav ml-auto">
+          <li style="color: aliceblue;"><span class="glyphicon glyphicon-log-in"></span> <%= user %></li>
+
+        <li style="margin-left: 15;"><a href="/"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
+      </ul>
+    
+
+     
+    
+    
+    </nav>
+
+<main role="main" class="container" style="margin-top:80px">
+
+
+
+<div class="row">
+<div class="col-md-6">
+  <h3 id="mylist">My Todo List</h3>
+<div id="todo"  >
+
+
+<div ng-repeat="x in todos" class="card">
+  <div class="card-header">
+      <div class="d-flex justify-content-between">
+          <div class="p-2">{{x.title}}</div>
+          <div>
+
+              <button type="button" ng-click="deletetodo(x._id)" class="btn btn-danger">Delete</button>
+
+          </div>
+        </div>
+
+  </div>
+  <div class="card-body">
+    <p class="card-text">{{x.desc}}</p>
+  </div>
+</div>
+
+</div>
+
+</div>
+
+<div class="col-md-6">
+
+  <h3>Create ToDo </h3>
+
+  <form>
+      <div class="form-group">
+        <label for="formGroupExampleInput">Title</label>
+        <input type="text" class="form-control" ng-model="title" id="title" placeholder="">
+      </div>
+      <div class="form-group">
+        <label for="formGroupExampleInput2">Description</label>
+        <textarea type="text" class="form-control" id="desc" ng-model="desc" placeholder=""></textarea>
+      </div>
+      <p id="error"></p>
+
+      <button type="button" ng-click="sendata()" class="btn btn-primary">Add ToDo</button>
+
+    </form>
+
+    <div id="like_button_container"></div>
+
+
+
+</div>
+
+</div>
+<p id="token" hidden><%= token %></p>
+
+<script>
+
+
+async function sendata2()
+{
+  title=document.getElementById("title").value
+  desc=document.getElementById("desc").value
+  
+  if(title=="")
+	{
+	document.getElementById("error").innerHTML="Title Cannot Be Blank"
+	return
+  }
+
+  let resp=await fetch("addtodo" , {
+    headers: {
+        'auth-token':token,
+			'Accept': 'application/json',
+			'Content-Type': 'application/json'
+			},
+			method: "POST",
+			body: JSON.stringify({'title':title, 'desc': desc})
+			}
+				
+		
+      )
+      document.getElementById("title").value=""
+      document.getElementById("desc").value=""
+      document.getElementById("error").innerHTML="Todo Added"
+
+  
+}
+
+
+
+</script>
+
+
+</main><!-- /.container -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+</html>
